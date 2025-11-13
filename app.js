@@ -15,12 +15,14 @@
 // i שורות מקובץ שלישי
 
 // אם אחד הקבצים קצר מאחרים – ממשיכים לעתיק מקבצים האחרים.
+
 const fs = require("fs");
 const path = require("path");
 
 const folderPath = path.join(__dirname, "text");
 const outputFile = path.join(__dirname, "text/output.txt");
 
+// איפוס קובץ פלט
 if (fs.existsSync(outputFile)) fs.unlinkSync(outputFile);
 
 //const fileNames = ["1.txt.txt", "2.txt.txt", "3.txt.txt"];
@@ -28,6 +30,7 @@ let fileNames = fs.readdirSync(folderPath);
 fileNames = fileNames.filter((f) => f.endsWith(".txt") && f !== "output.txt");
 
 function readLinesKeep(text) {
+  // קריאה מראש של הקבצים למערכים של שורות + אינדקס התקדמות לכל קובץ
   const arr = text.split(/\r?\n/);
   if (arr.length && arr[arr.length - 1] === "") arr.pop();
   return arr;
@@ -37,13 +40,14 @@ const files = fileNames.map((name) => {
   const p = path.join(folderPath, name);
   if (!fs.existsSync(p)) {
     console.log(`The file ${name} doesn't exist in folder "text"`);
-    return { name, lines: [], idx: 0 };
+    return { name, lines: [], idx: 0 };  // ריק => יתפס כשנגמר
   }
   const content = fs.readFileSync(p, "utf8");
   return { name, lines: readLinesKeep(content), idx: 0 };
 });
 
 function copyUpTo(file, count, sink) {
+  // פונקציה שמעבירה עד count שורות מקובץ לפלט ומחזירה כמה באמת הועברו
   if (file.idx >= file.lines.length) return 0;
   const start = file.idx;
   const end = Math.min(file.idx + count, file.lines.length);
@@ -63,4 +67,5 @@ while (files.some((f) => f.idx < f.lines.length)) {
 }
 
 console.log("The output file created successfully");
+
 
